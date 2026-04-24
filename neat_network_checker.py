@@ -64,7 +64,6 @@ NEAT_COMMON: List[CheckItem] = [
     CheckItem("Neat OTA Updates",           "Neat Common", "https",   "ota.neat.no",               443, "Firmware / OTA update server"),
     CheckItem("Neat Pulse Platform",        "Neat Common", "https",   "pulse.neat.no",             443, "Neat Pulse management platform"),
     CheckItem("Neat Pulse API",             "Neat Common", "https",   "api.pulse.neat.no",         443, "Neat Pulse management API"),
-    CheckItem("Neat NTP (time.neat.no)",    "Neat Common", "udp_ntp", "time.neat.no",              123, "Default NTP server (UDP 123)"),
 ]
 
 ZOOM: List[CheckItem] = [
@@ -535,11 +534,12 @@ def run_checks(modes: List[str], custom_ntp: str,
     checks: List[CheckItem] = []
     for m in modes:
         checks.extend(ALL_CHECKS.get(m, []))
-    if custom_ntp:
-        checks.append(CheckItem(
-            f"Custom NTP: {custom_ntp}", "Custom NTP", "udp_ntp",
-            custom_ntp, 123, "User-specified NTP server"
-        ))
+    ntp_target = custom_ntp or "time.neat.no"
+    ntp_label  = f"NTP ({ntp_target})"
+    checks.append(CheckItem(
+        ntp_label, "Neat Common", "udp_ntp",
+        ntp_target, 123, f"NTP server UDP 123 → {ntp_target}"
+    ))
 
     for c in checks:
         try:
@@ -678,11 +678,25 @@ HTML_UI = r"""<!DOCTYPE html>
         padding:14px 18px;margin:12px 18px 0}
   .card h2{font-size:12px;font-weight:700;color:#555;text-transform:uppercase;
            letter-spacing:.06em;margin-bottom:10px}
+  /* ── Neat Common always-on row ── */
+  .neat-always{display:flex;align-items:center;gap:12px;
+               background:linear-gradient(90deg,#e8f5e9,#f1f8e9);
+               border:2px solid #a5d6a7;border-radius:10px;
+               padding:10px 14px;margin-bottom:14px}
+  .neat-always-icon{font-size:20px;line-height:1}
+  .neat-always-body{flex:1}
+  .neat-always-title{font-size:13px;font-weight:700;color:#1b5e20}
+  .neat-always-desc{font-size:11px;color:#388e3c;margin-top:2px;line-height:1.4}
+  .badge-always{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;
+                background:#2e7d32;color:#fff;white-space:nowrap}
+  /* ── Platform selection ── */
+  .platform-label{font-size:11px;font-weight:700;color:#888;
+                  text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
   .modes{display:flex;flex-wrap:wrap;gap:8px}
   .mode-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;
              border:2px solid #e0e0e0;cursor:pointer;font-size:12px;font-weight:600;
-             background:#fff;transition:.15s;user-select:none}
-  .mode-btn:hover{border-color:#90a4ae}
+             background:#fff;transition:.15s;user-select:none;color:#555}
+  .mode-btn:hover{border-color:#90a4ae;background:#fafafa}
   .mode-btn.active{border-color:#1565c0;background:#e3f2fd;color:#0d47a1}
   .mode-btn input{display:none}
   .opt-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
@@ -784,12 +798,34 @@ HTML_UI = r"""<!DOCTYPE html>
 <!-- Check Modes -->
 <div class="card">
   <h2 data-i18n="section_modes">Check Modes</h2>
+
+  <!-- Neat Common — always included -->
+  <div class="neat-always">
+    <div class="neat-always-icon">🖥</div>
+    <div class="neat-always-body">
+      <div class="neat-always-title">Neat Common</div>
+      <div class="neat-always-desc" data-i18n="neat_always_desc">
+        connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)
+      </div>
+    </div>
+    <span class="badge-always" data-i18n="neat_always_badge">Always included</span>
+  </div>
+
+  <!-- Platform selection -->
+  <div class="platform-label" data-i18n="section_platform">Select platform to check (optional)</div>
   <div class="modes" id="modeGroup">
-    <label class="mode-btn active"><input type="checkbox" value="neat" checked> 🖥 Neat Common</label>
-    <label class="mode-btn active"><input type="checkbox" value="zoom" checked> 🔵 Zoom Rooms</label>
-    <label class="mode-btn active"><input type="checkbox" value="teams" checked> 🟣 Teams Rooms</label>
-    <label class="mode-btn active"><input type="checkbox" value="meet" checked> 🟢 Google Meet</label>
-    <label class="mode-btn active" title="" data-i18n-title="byod_title"><input type="checkbox" value="byod" checked> 💻 BYOD</label>
+    <label class="mode-btn" title="" data-i18n-title="byod_title">
+      <input type="checkbox" value="zoom"> 🔵 Zoom Rooms
+    </label>
+    <label class="mode-btn" title="" data-i18n-title="byod_title">
+      <input type="checkbox" value="teams"> 🟣 Teams Rooms
+    </label>
+    <label class="mode-btn" title="" data-i18n-title="byod_title">
+      <input type="checkbox" value="meet"> 🟢 Google Meet
+    </label>
+    <label class="mode-btn" title="" data-i18n-title="byod_title">
+      <input type="checkbox" value="byod"> 💻 BYOD
+    </label>
   </div>
 </div>
 
@@ -826,9 +862,9 @@ HTML_UI = r"""<!DOCTYPE html>
 
     <!-- NTP -->
     <div class="opt-group">
-      <span class="field-label" data-i18n="ntp_label">Custom NTP Server</span>
-      <input type="text" id="ntpInput" data-i18n-placeholder="ntp_ph">
-      <span class="hint" data-i18n="ntp_hint">UDP 123 tested in addition to time.neat.no</span>
+      <span class="field-label" data-i18n="ntp_label">NTP Server</span>
+      <input type="text" id="ntpInput" value="time.neat.no">
+      <span class="hint" data-i18n="ntp_hint">NTP server to check (UDP 123). Default: time.neat.no</span>
     </div>
 
     <!-- mDNS -->
@@ -927,10 +963,12 @@ const LANGS = {
     title:"Neat Network Connectivity Checker",
     subtitle:"Validates firewall & network requirements for Neat devices",
     section_modes:"Check Modes",
+    neat_always_badge:"Always included",
+    neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
+    section_platform:"Select platform to check (optional)",
     section_options:"Optional Checks",
-    ntp_label:"Custom NTP Server",
-    ntp_ph:"e.g. ntp.example.com or 192.168.1.1",
-    ntp_hint:"UDP 123 tested in addition to time.neat.no",
+    ntp_label:"NTP Server",
+    ntp_hint:"NTP server to check (UDP 123). Default: time.neat.no",
     mdns_label:"mDNS Check",
     mdns_tag:"Local Network",
     mdns_hint:"Sends PTR query to 224.0.0.251:5353 to verify multicast connectivity and Neat device discovery.",
@@ -975,10 +1013,12 @@ const LANGS = {
     title:"Neat ネットワーク接続チェッカー",
     subtitle:"Neat デバイスのファイアウォール・ネットワーク要件を検証します",
     section_modes:"チェックモード",
+    neat_always_badge:"常時実行",
+    neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
+    section_platform:"プラットフォームを選択（オプション）",
     section_options:"オプションチェック",
-    ntp_label:"カスタム NTP サーバ",
-    ntp_ph:"例: ntp.example.com または 192.168.1.1",
-    ntp_hint:"time.neat.no に加えて UDP 123 でテストします",
+    ntp_label:"NTP サーバ",
+    ntp_hint:"チェックする NTP サーバ（UDP 123）。デフォルト: time.neat.no",
     mdns_label:"mDNS チェック",
     mdns_tag:"ローカルネットワーク",
     mdns_hint:"224.0.0.251:5353 に PTR クエリを送信し、マルチキャスト疎通と Neat デバイス検出を確認します。",
@@ -1023,10 +1063,12 @@ const LANGS = {
     title:"Neat 네트워크 연결 검사기",
     subtitle:"Neat 디바이스의 방화벽 및 네트워크 요구사항을 검증합니다",
     section_modes:"검사 모드",
+    neat_always_badge:"항상 포함",
+    neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
+    section_platform:"플랫폼 선택 (선택 사항)",
     section_options:"선택 검사",
-    ntp_label:"사용자 지정 NTP 서버",
-    ntp_ph:"예: ntp.example.com 또는 192.168.1.1",
-    ntp_hint:"time.neat.no에 추가하여 UDP 123으로 테스트합니다",
+    ntp_label:"NTP 서버",
+    ntp_hint:"검사할 NTP 서버 (UDP 123). 기본값: time.neat.no",
     mdns_label:"mDNS 검사",
     mdns_tag:"로컬 네트워크",
     mdns_hint:"224.0.0.251:5353으로 PTR 쿼리를 전송하여 멀티캐스트 연결 및 Neat 디바이스 검색을 확인합니다.",
@@ -1071,10 +1113,12 @@ const LANGS = {
     title:"Neat 網路連線檢查工具",
     subtitle:"驗證 Neat 裝置的防火牆和網路需求",
     section_modes:"檢查模式",
+    neat_always_badge:"永遠包含",
+    neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
+    section_platform:"選擇平台（可選）",
     section_options:"選用檢查",
-    ntp_label:"自訂 NTP 伺服器",
-    ntp_ph:"例：ntp.example.com 或 192.168.1.1",
-    ntp_hint:"除 time.neat.no 外，另以 UDP 123 測試",
+    ntp_label:"NTP 伺服器",
+    ntp_hint:"要檢查的 NTP 伺服器（UDP 123）。預設：time.neat.no",
     mdns_label:"mDNS 檢查",
     mdns_tag:"本地網路",
     mdns_hint:"向 224.0.0.251:5353 傳送 PTR 查詢，確認多播連通性與 Neat 裝置探索。",
@@ -1119,10 +1163,12 @@ const LANGS = {
     title:"Neat 网络连接检查工具",
     subtitle:"验证 Neat 设备的防火墙和网络需求",
     section_modes:"检查模式",
+    neat_always_badge:"始终包含",
+    neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
+    section_platform:"选择平台（可选）",
     section_options:"可选检查",
-    ntp_label:"自定义 NTP 服务器",
-    ntp_ph:"例：ntp.example.com 或 192.168.1.1",
-    ntp_hint:"除 time.neat.no 外，另以 UDP 123 测试",
+    ntp_label:"NTP 服务器",
+    ntp_hint:"要检查的 NTP 服务器（UDP 123）。默认：time.neat.no",
     mdns_label:"mDNS 检查",
     mdns_tag:"本地网络",
     mdns_hint:"向 224.0.0.251:5353 发送 PTR 查询，确认组播连通性与 Neat 设备发现。",
@@ -1221,9 +1267,10 @@ const icons = {pass:'✅', fail:'❌', warn:'⚠️'};
 
 // ── Start ─────────────────────────────────────────────────────
 document.getElementById('btnStart').addEventListener('click', () => {
-  const modes = [...document.querySelectorAll('.mode-btn input:checked')].map(c=>c.value);
-  if (!modes.length) { alert(t('alert_no_mode')); return; }
-  const ntp         = document.getElementById('ntpInput').value.trim();
+  // Neat Common is always included; add selected platforms on top
+  const platforms = [...document.querySelectorAll('.mode-btn input:checked')].map(c=>c.value);
+  const modes = ['neat', ...platforms];
+  const ntp         = document.getElementById('ntpInput').value.trim() || 'time.neat.no';
   const mdns        = document.getElementById('mdnsCheck').checked;
   const mdnsTimeout = document.getElementById('mdnsTimeout').value || '3';
   const runProxy    = document.getElementById('proxyCheck').checked;
@@ -1241,7 +1288,7 @@ document.getElementById('btnStart').addEventListener('click', () => {
   doneChecks = 0; totalChecks = 0;
 
   let qs = 'modes=' + modes.join(',');
-  if (ntp)      qs += '&ntp='          + encodeURIComponent(ntp);
+  qs += '&ntp=' + encodeURIComponent(ntp);
   if (mdns)     qs += '&mdns=1&mdns_timeout=' + encodeURIComponent(mdnsTimeout);
   if (runProxy) qs += '&proxy=1';
   if (runBw)    qs += '&bw=1';
@@ -1382,7 +1429,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
         elif path == "/api/check":
             modes         = qs.get("modes",        ["neat"])[0].split(",")
-            custom_ntp    = qs.get("ntp",          [""])[0].strip()
+            custom_ntp    = qs.get("ntp",          ["time.neat.no"])[0].strip()
             run_mdns      = qs.get("mdns",         ["0"])[0] == "1"
             mdns_timeout  = float(qs.get("mdns_timeout", ["3"])[0])
             run_proxy     = qs.get("proxy",        ["0"])[0] == "1"
@@ -1433,7 +1480,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
         # Count expected checks
         total  = sum(len(ALL_CHECKS.get(m, [])) for m in modes)
-        total += 1 if custom_ntp    else 0
+        total += 1                           # NTP always runs (time.neat.no or custom)
         total += 2 if run_proxy     else 0   # proxy + ssl_inspect
         total += 1 if run_mdns      else 0
         total += 2 if run_bandwidth else 0   # download + upload
