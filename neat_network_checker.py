@@ -64,7 +64,6 @@ NEAT_COMMON: List[CheckItem] = [
     CheckItem("Neat OTA Updates",           "Neat Common", "https",   "ota.neat.no",               443, "Firmware / OTA update server"),
     CheckItem("Neat Pulse Platform",        "Neat Common", "https",   "pulse.neat.no",             443, "Neat Pulse management platform"),
     CheckItem("Neat Pulse API",             "Neat Common", "https",   "api.pulse.neat.no",         443, "Neat Pulse management API"),
-    CheckItem("Neat Support Portal",        "Neat Common", "https",   "support.neat.no",           443, "Neat Support site"),
     CheckItem("Neat NTP (time.neat.no)",    "Neat Common", "udp_ntp", "time.neat.no",              123, "Default NTP server (UDP 123)"),
 ]
 
