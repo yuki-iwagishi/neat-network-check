@@ -371,7 +371,7 @@ def check_bandwidth(direction: str = "download",
             mbps = (received * 8) / (elapsed_s * 1_000_000)
             elapsed_ms = elapsed_s * 1000
             label = "Download"
-            pass_thr, warn_thr = 3.6, 1.8
+            pass_thr, warn_thr = 4.0, 2.0
 
         else:  # upload
             url     = "https://speed.cloudflare.com/__up"
@@ -394,15 +394,17 @@ def check_bandwidth(direction: str = "download",
             label = "Upload"
             pass_thr, warn_thr = 3.8, 1.9
 
-        # Platform Full-HD thresholds (per-participant):
-        #   Zoom 1080p:         3.8 Mbps up / 3.0 Mbps down  (KB0060748)
-        #   Google Meet 1080p:  3.6 Mbps up / 3.6 Mbps down  (workspace.google.com)
-        #   Teams (premium):   10.0 Mbps recommended for board meetings / Live Events
+        # Platform Full-HD thresholds (per-participant, actual network requirements):
+        #   Zoom 1080p:        3.8 Mbps up / 3.0 Mbps down  (KB0060748)
+        #   Google Meet 1080p: 3.6 Mbps up / 3.6 Mbps down  (workspace.google.com)
+        #   Teams Rooms 1080p: 4.0 Mbps up / 4.0 Mbps down  (learn.microsoft.com/microsoftteams/prepare-network)
+        #   Note: Teams "Media Bit Rate" policy (10 Mbps) is an admin-configured cap,
+        #         NOT the actual per-participant network bandwidth requirement.
         # NOTE: This test is HTTP/TCP. Actual video traffic is UDP (RTP/SRTP).
         #       QoS policies may cause TCP and UDP throughput to differ.
         note = ("Full-HD thresholds — Zoom 1080p: 3.8↑/3.0↓ Mbps; "
                 "Google Meet 1080p: 3.6↑/3.6↓ Mbps; "
-                "Teams Live Events/board meetings: 10 Mbps recommended. "
+                "Teams Rooms 1080p: 4.0↑/4.0↓ Mbps. "
                 "⚠ TCP reference only — actual media uses UDP (RTP/SRTP)")
         msg = (f"{label}: {mbps:.1f} Mbps  "
                f"({size_mb} MB transferred in {elapsed_s:.1f}s) — {note}")
@@ -900,7 +902,7 @@ HTML_UI = r"""<!DOCTYPE html>
         <span class="toggle-label" data-i18n="bw_label">Bandwidth Test</span>
         <span class="tag bandwidth" data-i18n="bw_tag">Speed</span>
       </label>
-      <span class="hint" data-i18n="bw_hint">Downloads and uploads 20 MB via Cloudflare to measure throughput. Validates Full-HD video requirements: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams Live Events 10 Mbps.</span>
+      <span class="hint" data-i18n="bw_hint">Downloads and uploads 20 MB via Cloudflare to measure throughput. Validates Full-HD video requirements: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams Rooms 1080p 4.0↑/4.0↓ Mbps.</span>
       <span class="hint" data-i18n="bw_note">⚠️ This test uses HTTP (TCP). Actual video/audio traffic is UDP (RTP/SRTP). Results are a TCP reference — QoS policies may cause TCP and UDP throughput to differ.</span>
     </div>
 
@@ -980,7 +982,7 @@ const LANGS = {
     proxy_hint:"Detects proxy configuration and checks for TLS MITM (SSL inspection) by examining certificate issuers.",
     bw_label:"Bandwidth Test",
     bw_tag:"Speed",
-    bw_hint:"Downloads and uploads 20 MB via Cloudflare to measure throughput. Validates Full-HD: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams Live Events 10 Mbps.",
+    bw_hint:"Downloads and uploads 20 MB via Cloudflare to measure throughput. Validates Full-HD: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams Rooms 1080p 4.0↑/4.0↓ Mbps.",
     bw_note:"⚠️ This test uses HTTP (TCP). Actual video/audio traffic is UDP (RTP/SRTP). Results are a TCP reference — QoS policies may cause TCP and UDP throughput to differ.",
     section_refs:"Reference Documentation",
     ref_neat_fw:"Network & Firewall Requirements",
@@ -1030,7 +1032,7 @@ const LANGS = {
     proxy_hint:"プロキシ設定を検出し、証明書発行者を確認して TLS MITM（SSL インスペクション）の有無をチェックします。",
     bw_label:"帯域幅テスト",
     bw_tag:"速度",
-    bw_hint:"Cloudflare 経由で 20 MB の送受信を行い、スループットを測定します。Full HD 要件: Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams ライブイベント 10 Mbps。",
+    bw_hint:"Cloudflare 経由で 20 MB の送受信を行い、スループットを測定します。Full HD 要件: Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams Rooms 1080p 4.0↑/4.0↓ Mbps。",
     bw_note:"⚠️ このテストは HTTP (TCP) を使用します。実際の映像・音声通信は UDP (RTP/SRTP) です。QoS ポリシーによって TCP と UDP の帯域が異なる場合があります。",
     section_refs:"参照ドキュメント",
     ref_neat_fw:"ネットワーク & ファイアウォール要件",
@@ -1080,7 +1082,7 @@ const LANGS = {
     proxy_hint:"프록시 설정을 감지하고 인증서 발급자를 확인하여 TLS MITM(SSL 검사) 여부를 확인합니다.",
     bw_label:"대역폭 테스트",
     bw_tag:"속도",
-    bw_hint:"Cloudflare를 통해 20 MB를 송수신하여 처리량을 측정합니다. Full HD 요건: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams 라이브 이벤트 10 Mbps.",
+    bw_hint:"Cloudflare를 통해 20 MB를 송수신하여 처리량을 측정합니다. Full HD 요건: Zoom 1080p 3.8↑/3.0↓ Mbps, Google Meet 1080p 3.6↑/3.6↓ Mbps, Teams Rooms 1080p 4.0↑/4.0↓ Mbps.",
     bw_note:"⚠️ 이 테스트는 HTTP(TCP)를 사용합니다. 실제 영상·음성 트래픽은 UDP(RTP/SRTP)입니다. QoS 정책에 따라 TCP와 UDP 대역폭이 다를 수 있습니다.",
     section_refs:"참조 문서",
     ref_neat_fw:"네트워크 & 방화벽 요건",
@@ -1130,7 +1132,7 @@ const LANGS = {
     proxy_hint:"偵測 Proxy 設定，並透過檢查憑證發行者確認是否存在 TLS MITM（SSL 解密）。",
     bw_label:"頻寬測試",
     bw_tag:"速度",
-    bw_hint:"透過 Cloudflare 傳輸 20 MB 以測量吞吐量。Full HD 要求：Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams 直播活動 10 Mbps。",
+    bw_hint:"透過 Cloudflare 傳輸 20 MB 以測量吞吐量。Full HD 要求：Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams Rooms 1080p 4.0↑/4.0↓ Mbps。",
     bw_note:"⚠️ 此測試使用 HTTP（TCP）。實際影音流量為 UDP（RTP/SRTP）。QoS 政策可能導致 TCP 與 UDP 頻寬有所差異。",
     section_refs:"參考文件",
     ref_neat_fw:"網路與防火牆需求",
@@ -1180,7 +1182,7 @@ const LANGS = {
     proxy_hint:"检测代理配置，并通过检查证书颁发机构确认是否存在 TLS MITM（SSL 解密）。",
     bw_label:"带宽测试",
     bw_tag:"速度",
-    bw_hint:"通过 Cloudflare 传输 20 MB 以测量吞吐量。Full HD 要求：Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams 直播活动 10 Mbps。",
+    bw_hint:"通过 Cloudflare 传输 20 MB 以测量吞吐量。Full HD 要求：Zoom 1080p 3.8↑/3.0↓ Mbps、Google Meet 1080p 3.6↑/3.6↓ Mbps、Teams Rooms 1080p 4.0↑/4.0↓ Mbps。",
     bw_note:"⚠️ 此测试使用 HTTP（TCP）。实际音视频流量为 UDP（RTP/SRTP）。QoS 策略可能导致 TCP 与 UDP 带宽存在差异。",
     section_refs:"参考文档",
     ref_neat_fw:"网络与防火墙要求",
