@@ -115,18 +115,74 @@ def setup_git_identity():
         ok(f"git user.email = {email}")
 
 
+def embed_token_in_url(url: str, username: str, token: str) -> str:
+    """Convert https://github.com/user/repo → https://user:token@github.com/user/repo"""
+    if url.startswith("https://") and "@" not in url:
+        url = url.replace("https://", f"https://{username}:{token}@")
+    return url
+
+
+def mask_url(url: str) -> str:
+    """Hide the token in log output: https://user:ghp_***@github.com/..."""
+    import re
+    return re.sub(r"(https://[^:]+:)([^@]+)(@)", r"\1ghp_***\3", url)
+
+
+def ask_token_if_needed(url: str) -> str:
+    """
+    If the remote URL does not already contain a token, ask the user for one
+    and embed it so git push works without an interactive password prompt.
+    The token is stored only in the local git config (not committed).
+    """
+    if "@" in url.replace("https://", ""):
+        # Token already embedded
+        ok(f"Remote (with token): {mask_url(url)}")
+        reenter = input("  Re-enter token? [y/N]: ").strip().lower()
+        if reenter != "y":
+            return url
+
+    print()
+    info("A Personal Access Token is required for authentication.")
+    info("Create one at: https://github.com/settings/tokens/new")
+    info("  → Expiration: 90 days or No expiration")
+    info("  → Scope: check ✅ repo")
+    print()
+
+    username = git("config", "user.name", capture=True, check=False).stdout.strip()
+    if not username:
+        username = get_or_ask("GitHub username")
+
+    import getpass
+    token = getpass.getpass("  Paste your Personal Access Token (hidden): ").strip()
+    if not token:
+        warn("No token entered — git will ask for credentials during push.")
+        return url
+
+    new_url = embed_token_in_url(
+        url.split("@")[-1] if "@" in url else url,  # strip any old credentials
+        username, token
+    )
+    # Prepend scheme if accidentally stripped
+    if not new_url.startswith("https://"):
+        new_url = "https://" + new_url
+
+    git("remote", "set-url", "origin", new_url)
+    ok(f"Token saved in remote URL: {mask_url(new_url)}")
+    info("You will not be asked for a password again on this machine.")
+    return new_url
+
+
 def setup_remote():
-    """Return the remote URL, configuring it if missing."""
+    """Configure remote origin, embedding a PAT for password-free push."""
     remotes = git("remote", "-v", capture=True, check=False).stdout.strip()
     if "origin" in remotes:
         url = git("remote", "get-url", "origin", capture=True).stdout.strip()
-        ok(f"Remote origin = {url}")
+        ok(f"Remote origin = {mask_url(url)}")
         change = input("  Change remote URL? [y/N]: ").strip().lower()
         if change == "y":
-            url = get_or_ask("New GitHub repository URL")
+            url = get_or_ask("New GitHub repository URL (https://github.com/...)")
             git("remote", "set-url", "origin", url)
             ok(f"Updated remote origin → {url}")
-        return url
     else:
         print()
         warn("No remote 'origin' configured.")
@@ -136,7 +192,10 @@ def setup_remote():
         url = get_or_ask("Paste your GitHub repository URL (https://github.com/...)")
         git("remote", "add", "origin", url)
         ok(f"Remote origin set → {url}")
-        return url
+
+    url = git("remote", "get-url", "origin", capture=True).stdout.strip()
+    url = ask_token_if_needed(url)
+    return url
 
 
 # ── Commit & push ────────────────────────────────────────────────────────────
