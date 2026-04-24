@@ -42,7 +42,6 @@ python3 neat_network_checker.py
 | OTA アップデート | ota.neat.no | HTTPS 443 |
 | Pulse プラットフォーム | pulse.neat.no | HTTPS 443 |
 | Pulse API | api.pulse.neat.no | HTTPS 443 |
-| サポートポータル | support.neat.no | HTTPS 443 |
 | NTP | time.neat.no | UDP 123 |
 
 ### 🔵 Zoom Rooms
@@ -55,7 +54,7 @@ UDP ポート: 3478、3479（zoom.us 宛）、8801〜8803（Zoom IP レンジ宛
 ### 🟣 Microsoft Teams Rooms
 [Microsoft 365 URL & IP アドレス範囲](https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide#microsoft-teams) に基づいています。
 
-対象ドメイン: `teams.microsoft.com`、`skype.com`、`lync.com`、`microsoftonline.com`、`graph.microsoft.com`、`office365.com`、`microsoft.com`、`office.com`、`sfbassets.com`
+対象ドメイン: `teams.microsoft.com`、`skype.com`、`lync.com`、`microsoftonline.com`、`graph.microsoft.com`、`office365.com`、`microsoft.com`、`office.com`
 UDP ポート: 3478〜3481（worldaz.relay.teams.microsoft.com → 52.112.0.0/14 宛）
 
 ### 🟢 Google Meet

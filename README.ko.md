@@ -42,7 +42,6 @@ python3 neat_network_checker.py
 | OTA 업데이트 | ota.neat.no | HTTPS 443 |
 | Pulse 플랫폼 | pulse.neat.no | HTTPS 443 |
 | Pulse API | api.pulse.neat.no | HTTPS 443 |
-| 지원 포털 | support.neat.no | HTTPS 443 |
 | NTP | time.neat.no | UDP 123 |
 
 ### 🔵 Zoom Rooms
@@ -55,7 +54,7 @@ UDP 포트: 3478, 3479 (zoom.us), 8801~8803 (Zoom IP 범위)
 ### 🟣 Microsoft Teams Rooms
 [Microsoft 365 URL & IP 주소 범위](https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide#microsoft-teams) 기반.
 
-대상 도메인: `teams.microsoft.com`, `skype.com`, `lync.com`, `microsoftonline.com`, `graph.microsoft.com`, `office365.com`, `microsoft.com`, `office.com`, `sfbassets.com`
+대상 도메인: `teams.microsoft.com`, `skype.com`, `lync.com`, `microsoftonline.com`, `graph.microsoft.com`, `office365.com`, `microsoft.com`, `office.com`
 UDP 포트: 3478~3481 (worldaz.relay.teams.microsoft.com → 52.112.0.0/14)
 
 ### 🟢 Google Meet

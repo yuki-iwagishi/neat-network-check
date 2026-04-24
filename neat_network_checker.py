@@ -96,7 +96,6 @@ TEAMS: List[CheckItem] = [
     CheckItem("*.office365.com",          "Teams Rooms", "https",   "outlook.office365.com",            443, "Microsoft 365 services (TCP 443)"),
     CheckItem("*.microsoft.com",          "Teams Rooms", "https",   "www.microsoft.com",                443, "Microsoft CDN / services (TCP 443)"),
     CheckItem("*.office.com",             "Teams Rooms", "https",   "www.office.com",                   443, "Office platform (TCP 443)"),
-    CheckItem("*.sfbassets.com",          "Teams Rooms", "https",   "config.sfbassets.com",             443, "Teams static assets CDN (TCP 443)"),
     # ── UDP media — worldaz.relay.teams.microsoft.com → 52.112.0.0/14 ──
     CheckItem("Teams UDP 3478 (STUN)",    "Teams Rooms", "udp_stun","worldaz.relay.teams.microsoft.com",3478, "UDP 3478 → 52.112.0.0/14 (STUN/media)"),
     CheckItem("Teams UDP 3479 (audio)",   "Teams Rooms", "udp_stun","worldaz.relay.teams.microsoft.com",3479, "UDP 3479 → 52.112.0.0/14 (audio)"),
@@ -829,6 +828,9 @@ HTML_UI = r"""<!DOCTYPE html>
       <input type="checkbox" value="byod"> 💻 BYOD
     </label>
   </div>
+  <p class="hint" style="margin-top:10px" data-i18n="direct_guest_hint">
+    If your Neat device uses Direct Guest Join to connect to platforms other than its primary platform (e.g., a Zoom Rooms device joining a Teams or Google Meet meeting), also select and check those platforms above.
+  </p>
 </div>
 
 <!-- Reference Documentation -->
@@ -968,6 +970,7 @@ const LANGS = {
     neat_always_badge:"Always included",
     neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
     section_platform:"Select platform to check (optional)",
+    direct_guest_hint:"If your Neat device uses Direct Guest Join to connect to platforms other than its primary platform (e.g., a Zoom Rooms device joining a Teams or Google Meet meeting), also select and check those platforms above.",
     section_options:"Optional Checks",
     ntp_label:"NTP Server",
     ntp_hint:"NTP server to check (UDP 123). Default: time.neat.no",
@@ -1018,6 +1021,7 @@ const LANGS = {
     neat_always_badge:"常時実行",
     neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
     section_platform:"プラットフォームを選択（オプション）",
+    direct_guest_hint:"ダイレクトゲスト参加を利用して、メインプラットフォーム以外の会議に接続する場合（例：Zoom Rooms デバイスが Teams や Google Meet の会議に参加する場合）は、該当するプラットフォームも上記で選択してチェックしてください。",
     section_options:"オプションチェック",
     ntp_label:"NTP サーバ",
     ntp_hint:"チェックする NTP サーバ（UDP 123）。デフォルト: time.neat.no",
@@ -1068,6 +1072,7 @@ const LANGS = {
     neat_always_badge:"항상 포함",
     neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
     section_platform:"플랫폼 선택 (선택 사항)",
+    direct_guest_hint:"다이렉트 게스트 참가를 이용하여 기본 플랫폼 외 회의에 접속하는 경우(예: Zoom Rooms 디바이스가 Teams 또는 Google Meet 회의에 참가하는 경우), 해당 플랫폼도 위에서 선택하여 검사하세요.",
     section_options:"선택 검사",
     ntp_label:"NTP 서버",
     ntp_hint:"검사할 NTP 서버 (UDP 123). 기본값: time.neat.no",
@@ -1118,6 +1123,7 @@ const LANGS = {
     neat_always_badge:"永遠包含",
     neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
     section_platform:"選擇平台（可選）",
+    direct_guest_hint:"若您的 Neat 裝置透過「直接訪客加入」連接至主要平台以外的會議（例如：Zoom Rooms 裝置加入 Teams 或 Google Meet 會議），請同時選取並檢查上方對應的平台。",
     section_options:"選用檢查",
     ntp_label:"NTP 伺服器",
     ntp_hint:"要檢查的 NTP 伺服器（UDP 123）。預設：time.neat.no",
@@ -1168,6 +1174,7 @@ const LANGS = {
     neat_always_badge:"始终包含",
     neat_always_desc:"connectivitycheck · id · ota · pulse · api.pulse · NTP (time.neat.no)",
     section_platform:"选择平台（可选）",
+    direct_guest_hint:"如果您的 Neat 设备通过「直接访客加入」连接到主平台以外的会议（例如：Zoom Rooms 设备加入 Teams 或 Google Meet 会议），请同时选择并检查上方对应的平台。",
     section_options:"可选检查",
     ntp_label:"NTP 服务器",
     ntp_hint:"要检查的 NTP 服务器（UDP 123）。默认：time.neat.no",

@@ -42,7 +42,6 @@ Checks connectivity to core Neat infrastructure required by every device regardl
 | OTA Updates | ota.neat.no | HTTPS 443 |
 | Pulse Platform | pulse.neat.no | HTTPS 443 |
 | Pulse API | api.pulse.neat.no | HTTPS 443 |
-| Support Portal | support.neat.no | HTTPS 443 |
 | NTP | time.neat.no | UDP 123 |
 
 ### 🔵 Zoom Rooms
@@ -55,7 +54,7 @@ UDP ports: 3478, 3479 (to zoom.us), 8801–8803 (to Zoom IP ranges)
 ### 🟣 Microsoft Teams Rooms
 Based on [Microsoft 365 URL & IP Ranges](https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide#microsoft-teams).
 
-Domains: `teams.microsoft.com`, `skype.com`, `lync.com`, `microsoftonline.com`, `graph.microsoft.com`, `office365.com`, `microsoft.com`, `office.com`, `sfbassets.com`
+Domains: `teams.microsoft.com`, `skype.com`, `lync.com`, `microsoftonline.com`, `graph.microsoft.com`, `office365.com`, `microsoft.com`, `office.com`
 UDP ports: 3478–3481 (to worldaz.relay.teams.microsoft.com → 52.112.0.0/14)
 
 ### 🟢 Google Meet

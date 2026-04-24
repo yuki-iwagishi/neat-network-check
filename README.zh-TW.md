@@ -42,7 +42,6 @@ python3 neat_network_checker.py
 | OTA 更新 | ota.neat.no | HTTPS 443 |
 | Pulse 平台 | pulse.neat.no | HTTPS 443 |
 | Pulse API | api.pulse.neat.no | HTTPS 443 |
-| 支援入口 | support.neat.no | HTTPS 443 |
 | NTP | time.neat.no | UDP 123 |
 
 ### 🔵 Zoom Rooms
@@ -55,7 +54,7 @@ UDP 埠：3478、3479（至 zoom.us）、8801〜8803（至 Zoom IP 範圍）
 ### 🟣 Microsoft Teams Rooms
 依據 [Microsoft 365 URL 與 IP 位址範圍](https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide#microsoft-teams)。
 
-目標網域：`teams.microsoft.com`、`skype.com`、`lync.com`、`microsoftonline.com`、`graph.microsoft.com`、`office365.com`、`microsoft.com`、`office.com`、`sfbassets.com`
+目標網域：`teams.microsoft.com`、`skype.com`、`lync.com`、`microsoftonline.com`、`graph.microsoft.com`、`office365.com`、`microsoft.com`、`office.com`
 UDP 埠：3478〜3481（至 worldaz.relay.teams.microsoft.com → 52.112.0.0/14）
 
 ### 🟢 Google Meet
